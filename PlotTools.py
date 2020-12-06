@@ -23,7 +23,9 @@ class FullSelection:
         for d in self.Discriminations: d.ProcessData(Data)
 
     def CSVLoad(self):
+        for f in self.Flows: f.CSVLoad()
         for c in self.Cuts: c.CSVLoad()
+        for d in self.Discriminations: d.CSVLoad()
 
     def CSVDump(self, Reset=True):
         for f in self.Flows: f.CSVDump(Reset)

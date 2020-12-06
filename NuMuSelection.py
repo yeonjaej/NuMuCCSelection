@@ -15,8 +15,8 @@ def GetCFG():
       TreeName: 'recTree'
     GenSettings:
       BatchSize: 1000
-      ReloadData: no
-      Reset: yes
+      ReloadData: yes
+      Reset: no
     """
     cfg = yaml.load(cfg, Loader=yaml.FullLoader)
     #cfg['PathVariables']['InputFile'] = 'gen-prodcorsika_genie_nooverburden_icarus_Oct2020_20201124T132115_recoSCEfix.flat.root'
@@ -43,8 +43,6 @@ def GetFiles(Type, Reset=False):
     return [ x.strip('\n') for x in Files ]
 
 def main():
-    GetFiles('cosmics')
-    NuCosmics = GetFiles('nucosmics')
     cfg, PlotCFG = GetCFG()
     Prog = dict()
     Scores = {'NuScore': 0.4,
@@ -55,6 +53,8 @@ def main():
         NuMuCCFullSelection.CSVLoad()
         NuMuCCFullSelection.DrawHists()
     else:
+        Cosmics = GetFiles('cosmics')
+        NuCosmics = GetFiles('nucosmics')
         for f in NuCosmics[:1]:
             Data, Prog = LoadData(f,
                                   cfg['GenSettings']['BatchSize'],
