@@ -15,8 +15,8 @@ def GetCFG():
       TreeName: 'recTree'
     GenSettings:
       BatchSize: 1000
-      ReloadData: yes
-      Reset: no
+      ReloadData: no
+      Reset: yes
     """
     cfg = yaml.load(cfg, Loader=yaml.FullLoader)
     #cfg['PathVariables']['InputFile'] = 'gen-prodcorsika_genie_nooverburden_icarus_Oct2020_20201124T132115_recoSCEfix.flat.root'
@@ -55,7 +55,7 @@ def main():
     else:
         Cosmics = GetFiles('cosmics')
         NuCosmics = GetFiles('nucosmics')
-        for f in NuCosmics[:1]:
+        for f in NuCosmics:
             Data, Prog = LoadData(f,
                                   cfg['GenSettings']['BatchSize'],
                                   Prog,
