@@ -55,13 +55,14 @@ def main():
     else:
         Cosmics = GetFiles('cosmics')
         NuCosmics = GetFiles('nucosmics')
-        for f in NuCosmics:
+        for i, f in enumerate(NuCosmics):
             Data, Prog = LoadData(f,
                                   cfg['GenSettings']['BatchSize'],
                                   Prog,
                                   Scores)
             NuMuCCFullSelection.ProcessData(Data)
             Prog = dict()
+            print(f'Completed file(s): {i+1}')
         NuMuCCFullSelection.CSVDump(Reset=cfg['GenSettings']['Reset'])
         #NuMuCCFullSelection.DrawHists()
 
