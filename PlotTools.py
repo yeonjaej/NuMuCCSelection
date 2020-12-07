@@ -127,6 +127,7 @@ class Discrimination:
         for t in CFG[self.FigName]['Types']:
             self.AddType(t['MaskVars'], t['Label'], t['Signal'])
 
+        self.DoCut = False
         if CFG[self.FigName]['SelVar'] != '':
             self.SetSelection(CFG[self.FigName]['SelVar'],
                               CFG[self.FigName]['Score'],
@@ -134,7 +135,6 @@ class Discrimination:
             
         self.Fig = plt.figure(tight_layout=True)
         self.Ax = self.Fig.add_subplot(1,1,1)
-        self.DoCut = False
 
     def AddType(self, MaskVar, Label, Signal=True):
         if isinstance(MaskVar, str):
