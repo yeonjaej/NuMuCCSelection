@@ -8,25 +8,11 @@ plt.rcParams['text.usetex']=True
 plt.rcParams['savefig.facecolor']='white'
 
 def GetCFG():
-    cfg="""
-    PathVariables:
-      InputPath: '/home/mueller/Projects/NuMuSelection/'
-      InputFile: 'icarus_2500.flat.root'
-      TreeName: 'recTree'
-    GenSettings:
-      BatchSize: 1000
-      ReloadData: no
-      Reset: yes
-    """
-    cfg = yaml.load(cfg, Loader=yaml.FullLoader)
-    #cfg['PathVariables']['InputFile'] = 'gen-prodcorsika_genie_nooverburden_icarus_Oct2020_20201124T132115_recoSCEfix.flat.root'
-
     PlotCFGFile = open('cfg.yaml', 'r')
     PlotCFG = PlotCFGFile.read()
     PlotCFGFile.close()
     PlotCFG = yaml.load(PlotCFG, Loader=yaml.FullLoader)
-    
-    return cfg, PlotCFG
+    return PlotCFG
 
 def GetFiles(Type, Reset=False):
     if Reset:
@@ -43,13 +29,13 @@ def GetFiles(Type, Reset=False):
     return [ x.strip('\n') for x in Files ]
 
 def main():
-    cfg, PlotCFG = GetCFG()
+    PlotCFG = GetCFG()
     Prog = dict()
     Scores = {'NuScore': 0.4,
               'FlashMatchScore': 7.0}
 
     NuMuCCFullSelection = FullSelection(PlotCFG, Scores)
-    if cfg['GenSettings']['ReloadData']:
+    if PlotCFG['GenSettings']['ReloadData']:
         NuMuCCFullSelection.CSVLoad()
         NuMuCCFullSelection.DrawHists()
     else:
@@ -57,14 +43,13 @@ def main():
         NuCosmics = GetFiles('nucosmics')
         for i, f in enumerate(NuCosmics):
             Data, Prog = LoadData(f,
-                                  cfg['GenSettings']['BatchSize'],
+                                  PlotCFG['GenSettings']['BatchSize'],
                                   Prog,
                                   Scores)
             NuMuCCFullSelection.ProcessData(Data)
             Prog = dict()
             print(f'Completed file(s): {i+1}')
-        NuMuCCFullSelection.CSVDump(Reset=cfg['GenSettings']['Reset'])
-        #NuMuCCFullSelection.DrawHists()
+        NuMuCCFullSelection.CSVDump(Reset=PlotCFG['GenSettings']['Reset'])
 
 if __name__ == '__main__':
     main()

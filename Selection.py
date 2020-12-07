@@ -84,33 +84,15 @@ def TruePrimaryTracks(Data):
     RetVal[ RetVal < 0 ] = -1
     return RetVal
 
-def fdd():
-    # Primary track selection.
+def NeutrinoPOT(Data):
+    _, Ind = np.unique(Data['hdr.subrun'] + Data['hdr.run']*100, return_index=True)
+    return np.sum(Data['hdr.pot'][Ind])
 
-    # First we retrieve the list of indices corresponding to the identified primary tracks. Then
-    # we create PrimaryTrackInd, which is an JaggedArray (of length #slices) with a single entry
-    # in each row containing the index of the longest muon candidate track (empty entry if no such
-    # candidate.
-    PrimaryTrack = PrimaryTracks(Data)
-    PrimaryTrackInd = ak.JaggedArray.fromcounts((PrimaryTrack >=0)*1, PrimaryTrack[PrimaryTrack >= 0])
+def NGenEvt(Data):
+    _, Ind = np.unique(Data['hdr.subrun'] + Data['hdr.run']*100, return_index=True)
+    return np.sum(Data['hdr.ngenevt'][Ind])
 
-    # We do the same thing with the truth information.
-    TruePrimaryTrack = TruePrimaryTracks(Data)
-    TruePrimaryTrackInd = ak.JaggedArray.fromcounts((TruePrimaryTrack >=0)*1, TruePrimaryTrack[TruePrimaryTrack >= 0])
-    HasTruePrimaryTack = TruePrimaryTrack >= 0
+def NEvt(Data):
+    return len(Data['hdr.evt'])
 
-    
-    Valid = ((Data['slc.reco.trk.truth.p.length'] > 50.) &
-             (Data['slc.reco.trk.truth.p.inAV'] | (Data['slc.reco.trk.truth.p.length'] > 100.0)) &
-             Data['con.is_numu_cc'] &
-             Data['con.TruthInFV'])
-    
-    ValidPrimary = PrimaryTrack == np.nan
-    ValidPrimary[PrimaryTrackInd.count() > 0] = Valid[PrimaryTrackInd].flatten()
-    Data['con.trk.good_ptrack'] = PrimaryTrack[ValidPrimary & Data['con.match_is_primary']] == TruePrimaryTrack[ValidPrimary & Data['con.match_is_primary']]
-    Data['con.valid_matched_primary'] = ValidPrimary
-    Data['con.ptrack_and_pmatch'] = (ValidPrimary &
-                                     Data['con.match_is_primary'])
-    Data['con.ptrack_and_pmatch'][Data['con.ptrack_and_pmatch']] = Data['con.trk.good_ptrack']
-    Data['con.ptrack_pion'] = (ValidPrimary & (np.abs(Data['slc.reco.trk.truth.p.pdg']) == 211))
-    Data['con.ptrack_proton'] = (ValidPrimary & (np.abs(Data['slc.reco.trk.truth.p.pdg']) == 2212))
+def CosmicPOT(DataCosmic, DataNu):

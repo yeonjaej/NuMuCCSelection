@@ -1,3 +1,8 @@
+GenSettings:
+  BatchSize: 1000
+  ReloadData: yes
+  Reset: no
+
 Flows:
   - NuMuCCFlow:
       Selections:
@@ -157,7 +162,7 @@ Cuts:
       XLabel: "$\\nu$ Energy [GeV]"
       Text: "Fiducial (Truth)\nNon-Clear Cosmic\nPost-Pandora $\\nu$-Score\nPost Flash Matching Score"
       TextPos: [0.25, 0.5]
-      Var: "slc.truth.E"
+      Var: "con.mu_max_track"
       MaskVar: ["con.TruthInFV", "con.is_cosmic", "con.not_clear_cosmic", "con.nu_score", "con.flash_score"]
       SelVar: "con.has_ptrk"
       Remaining: yes

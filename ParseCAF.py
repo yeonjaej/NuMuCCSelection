@@ -109,7 +109,14 @@ def LoadData(File, sCount, Prog, Scores):
         "true_particles.G4ID",
         "true_particles.pdg",
         "pass_flashtrig",
-        "crt_hits.time"]
+        "crt_hits.time",
+        "hdr.pot",
+        "hdr.evt",
+        "hdr.fno",
+        "hdr.subrun",
+        "hdr.run",
+        "hdr.ngenevt",
+        "hdr.evt"]
     
     TreeNames = {
         "rec": 'nspill',
