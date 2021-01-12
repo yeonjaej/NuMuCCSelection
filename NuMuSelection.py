@@ -6,6 +6,7 @@ import glob
 import os
 plt.rcParams['text.usetex']=True
 plt.rcParams['savefig.facecolor']='white'
+plt.rcParams['figure.max_open_warning'] = 30
 
 def GetCFG():
     PlotCFGFile = open('cfg.yaml', 'r')
@@ -13,20 +14,6 @@ def GetCFG():
     PlotCFGFile.close()
     PlotCFG = yaml.load(PlotCFG, Loader=yaml.FullLoader)
     return PlotCFG
-
-def GetFiles(Type, Reset=False):
-    if Reset:
-        Files = glob.glob(f'/icarus/data/users/mueller/NuMuSelection/{Type}/*flat.root')
-        Files = [ x + '\n' for x in Files ]
-        Out = open(f'Files_{Type}', 'w')
-        Out.writelines(Files)
-        Out.close()
-    else:
-        In = open(f'Files_{Type}', 'r')
-        Files = In.readlines()
-        In.close()
-    
-    return [ x.strip('\n') for x in Files ]
 
 def main():
     PlotCFG = GetCFG()
@@ -39,17 +26,30 @@ def main():
         NuMuCCFullSelection.CSVLoad()
         NuMuCCFullSelection.DrawHists()
     else:
-        Cosmics = GetFiles('cosmics')
-        NuCosmics = GetFiles('nucosmics')
-        for i, f in enumerate(NuCosmics):
-            Data, Prog = LoadData(f,
-                                  PlotCFG['GenSettings']['BatchSize'],
-                                  Prog,
-                                  Scores)
-            NuMuCCFullSelection.ProcessData(Data)
-            Prog = dict()
-            print(f'Completed file(s): {i+1}')
+        POTInfo = dict()
+        Cosmics = '/home/mueller/Projects/NuMuSelection/icarus_cosmics.flat.root'
+        NuCosmics = '/home/mueller/Projects/NuMuSelection/icarus_nucosmics.flat.root'
+
+        Data, Prog, POTInfo = LoadData(NuCosmics,
+                                       PlotCFG['GenSettings']['BatchSize'],
+                                       Prog,
+                                       Scores,
+                                       POTInfo)
+        NuMuCCFullSelection.ProcessData(Data, POTInfo['NuPOTScale'])
+        Prog = dict()
+        print('Completed nucosmics.')
+
+        #Data, Prog, POTInfo = LoadData(Cosmics,
+        #                               PlotCFG['GenSettings']['BatchSize'],
+        #                               Prog,
+        #                               Scores,
+        #                               POTInfo)
+        #NuMuCCFullSelection.ProcessData(Data, POTInfo['CosPOTScale'])
+        #Prog = dict()
+        #print('Completed cosmics.')
+        
         NuMuCCFullSelection.CSVDump(Reset=PlotCFG['GenSettings']['Reset'])
+        NuMuCCFullSelection.DrawHists()
 
 if __name__ == '__main__':
     main()

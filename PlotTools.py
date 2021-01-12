@@ -7,20 +7,20 @@ class FullSelection:
     def __init__(self, CFG, Scores):
         self.Flows = list()
         for f in CFG['Flows']:
-            self.Flows.append(SelectionFlow(f))
+            if f[list(f.keys())[0]]['Run']: self.Flows.append(SelectionFlow(f))
 
         self.Cuts = list()
         for c in CFG['Cuts']:
-            self.Cuts.append(Selection(c))
+            if c[list(c.keys())[0]]['Run']: self.Cuts.append(Selection(c))
 
         self.Discriminations = list()
         for d in CFG['Discriminations']:
-            self.Discriminations.append(Discrimination(d))
+            if d[list(d.keys())[0]]['Run']: self.Discriminations.append(Discrimination(d))
         
-    def ProcessData(self, Data):
-        for f in self.Flows: f.ProcessData(Data)
-        for c in self.Cuts: c.ProcessData(Data)
-        for d in self.Discriminations: d.ProcessData(Data)
+    def ProcessData(self, Data, POTScale):
+        for f in self.Flows: f.ProcessData(Data, POTScale)
+        for c in self.Cuts: c.ProcessData(Data, POTScale)
+        for d in self.Discriminations: d.ProcessData(Data, POTScale)
 
     def CSVLoad(self):
         for f in self.Flows: f.CSVLoad()
@@ -43,7 +43,7 @@ class Selection:
         self.VarName = CFG[self.FigName]['Var']
         b = CFG[self.FigName]['Bins']
         self.Bins = np.linspace(b[0], b[1], b[2])
-        self.BinContent = np.zeros((2, len(self.Bins)-1), dtype=int)
+        self.BinContent = np.zeros((2, len(self.Bins)-1), dtype=float)
         self.Labels = CFG[self.FigName]['Labels']
         self.XLabel = CFG[self.FigName]['XLabel']
         self.Text = CFG[self.FigName]['Text']
@@ -58,18 +58,21 @@ class Selection:
         self.Ax = self.Fig.add_subplot(1,1,1)
         self.DisplayRemaining = CFG[self.FigName]['Remaining']
         
-    def ProcessData(self, Data):
+    def ProcessData(self, Data, POTScale):
         self.Var = Data[self.VarName]
-        self.Mask = np.ones(len(self.Var), dtype=bool)
-        for m in self.MaskVars: self.Mask = self.Mask & Data[m]
+        self.Mask = np.ones(len(self.Var), dtype=bool) & Data['cont.slc.cryo0']
+        for m in self.MaskVars:
+            self.Mask = self.Mask & Data[m]
         self.SelMask = Data[self.SelName]
         self.Vars = [self.Var[self.Mask & self.SelMask],
                      self.Var[self.Mask]]
         BinCounts = np.array((2,len(self.Bins)-1))
         for b in range(len(self.Vars)):
+            Weights = np.repeat(POTScale, len(self.Vars[b]))
             self.BinContent[b] += np.histogram(self.Vars[b],
                                                bins=len(self.Bins)-1,
-                                               range=(min(self.Bins), max(self.Bins)))[0]
+                                               range=(min(self.Bins), max(self.Bins)),
+                                               weights=Weights)[0]
     def Draw(self):
         for l in range(len(self.Labels)):
             self.Ax.hist(self.Bins[:-1],
@@ -79,7 +82,7 @@ class Selection:
                          weights=self.BinContent[l],
                          linewidth=3)
         self.Ax.set_xlabel(self.XLabel)
-        self.Ax.set_ylabel('Entries')
+        self.Ax.set_ylabel('Entries / 6.6e20 POT')
         if self.DisplayRemaining:
             if self.Text != '': self.Text += f'\nRemaining: {round(100*(sum(self.BinContent[0])/sum(self.BinContent[1])),2)}\%'
             else: self.Text += f'Remaining: {round(100*(sum(self.BinContent[0])/sum(self.BinContent[1])),2)}\%'
@@ -145,7 +148,7 @@ class Discrimination:
             self.TypeMask.append([])
         self.TypeLabels.append(Label)
         self.TypeIsSignal.append(Signal)
-        self.BinContent = np.zeros((len(self.TypeMask), len(self.Bins)-1))
+        self.BinContent = np.zeros((len(self.TypeMask), len(self.Bins)-1), dtype=float)
         self.PassFail.append(np.zeros(2))
         
     def SetSelection(self, SelVar, CutVal, CutAbove=True):
@@ -154,10 +157,11 @@ class Discrimination:
         self.CutAbove = CutAbove
         self.DoCut = True
 
-    def ProcessData(self, Data):
+    def ProcessData(self, Data, POTScale):
         Vars = list()
         for v in range(len(self.TypeMask)):
-            Mask = np.ones(len(Data[self.VarName]), dtype=bool)
+            Mask = np.ones(len(Data[self.VarName]), dtype=bool) & Data['cont.slc.cryo0']
+            if self.FigName == 'SlcX': Mask = np.ones(len(Data[self.VarName]), dtype=bool)
             for m in self.TypeMask[v]: Mask = Mask & Data[m]
             Vars.append(Data[self.VarName][Mask].flatten())
             if self.DoCut:
@@ -165,9 +169,11 @@ class Discrimination:
                 self.PassFail[v][1] += sum(Mask & np.invert(Data[self.SelVar]) & np.invert(np.isnan(Data[self.VarName])))
         BinCounts = np.array((len(Vars), len(self.Bins)-1))
         for b in range(len(Vars)):
+            Weights = np.repeat(POTScale, len(Vars[b]))
             self.BinContent[b] += np.histogram(Vars[b],
                                                bins=len(self.Bins)-1,
-                                               range=(min(self.Bins), max(self.Bins)))[0]
+                                               range=(min(self.Bins), max(self.Bins)),
+                                               weights=Weights)[0]
     def Draw(self):
         for l in range(len(self.TypeLabels)):
             if self.DoCut:
@@ -183,7 +189,7 @@ class Discrimination:
                          weights=self.BinContent[l],
                          linewidth=3)
         self.Ax.set_xlabel(self.XLabel)
-        self.Ax.set_ylabel('Entries')
+        self.Ax.set_ylabel('Entries / 6.6e20 POT')
         self.Ax.text(self.TextPos[0],
                      self.TextPos[1],
                      self.Text,
@@ -212,7 +218,8 @@ class Discrimination:
                              arrowprops=dict(arrowstyle="<-", color=c[1]), xycoords=self.Ax.transAxes,)
             self.Fig.text(TextHigh, 1.1, 'Rejected' if self.CutAbove else 'Selected', 
                           transform=self.Ax.transAxes, fontsize=12, color=c[1], horizontalalignment='center')
-        
+
+        if self.FigName == 'SlcX': self.Ax.set_yscale('log')
         self.Ax.legend()
         self.Fig.savefig(f'Plots/{self.FigName}.png')
 
@@ -243,9 +250,9 @@ class Discrimination:
             
 class SelectionFlow:
     def __init__(self, CFG):
-        self.Surviving = {'Cosmic': [0],
-                          'NuMuCC': [0],
-                          'OtherNu': [0]}
+        self.Surviving = {'Cosmic': [0.0],
+                          'NuMuCC': [0.0],
+                          'OtherNu': [0.0]}
         self.SelMasks = list()
         self.SelLabels = ['All Slices']
         self.FigName = list(CFG.keys())[0]
@@ -262,30 +269,30 @@ class SelectionFlow:
         elif isinstance(Masks, list):
             self.SelMasks.append(Masks)
         self.SelLabels.append(Label)
-        for k in self.Surviving.keys(): self.Surviving[k].append(0)
+        for k in self.Surviving.keys(): self.Surviving[k].append(0.0)
 
-    def ProcessData(self, Data):
+    def ProcessData(self, Data, POTScale):
         # First we count the slices before selections are applied.
-        self.Surviving['Cosmic'][0] += sum( Data['con.is_cosmic'] )
-        self.Surviving['NuMuCC'][0] += sum( Data['con.is_numu_cc'] )
-        self.Surviving['OtherNu'][0] += sum( (Data['con.is_nu'] & np.invert(Data['con.is_numu_cc'])) )
+        self.Surviving['Cosmic'][0] += POTScale * sum( Data['cont.slc.is_cosmic'] & Data['cont.slc.cryo0'] )
+        self.Surviving['NuMuCC'][0] += POTScale * sum( Data['cont.slc.is_numu_cc'] & Data['cont.slc.cryo0'] )
+        self.Surviving['OtherNu'][0] += POTScale * sum( (Data['cont.slc.is_nu'] & np.invert(Data['cont.slc.is_numu_cc'])) & Data['cont.slc.cryo0'] )
 
         # Create empty mask before looping through selections.
-        Mask = np.ones(len(Data['slc.nu_score']), dtype=bool)
+        Mask = np.ones(len(Data['conr.slc.nu_score']), dtype=bool)
 
         # Now iterate through selections and calculate surviving slices at each step.
         for i in range(len(self.SelMasks)):
             for s in self.SelMasks[i]: Mask = Mask & Data[s]
-            self.Surviving['Cosmic'][i+1] += sum( Mask & Data['con.is_cosmic'] )
-            self.Surviving['NuMuCC'][i+1] += sum( Mask & Data['con.is_numu_cc'] )
-            self.Surviving['OtherNu'][i+1] += sum( Mask & Data['con.is_nu'] & np.invert(Data['con.is_numu_cc']) )
+            self.Surviving['Cosmic'][i+1] += POTScale * sum( Mask & Data['cont.slc.is_cosmic'] )
+            self.Surviving['NuMuCC'][i+1] += POTScale * sum( Mask & Data['cont.slc.is_numu_cc'] )
+            self.Surviving['OtherNu'][i+1] += POTScale * sum( Mask & Data['cont.slc.is_nu'] & np.invert(Data['cont.slc.is_numu_cc']) )
             
     def Draw(self):
         Y = np.arange(len(self.SelLabels))[::-1]
         B0 = self.Ax.barh(Y-self.Width, self.Surviving['NuMuCC'], self.Width, label=r'$\nu_\mu$ CC')
         B1 = self.Ax.barh(Y, self.Surviving['Cosmic'], self.Width, label=r'Cosmics')
         B2 = self.Ax.barh(Y+self.Width, self.Surviving['OtherNu'], self.Width, label=r'Other $\nu$')
-        self.Ax.set_xlabel('Slices')
+        self.Ax.set_xlabel('Neutrino Candidates / 6.6e20 POT')
         self.Ax.set_title('Selection by Category')
         self.Ax.set_yticks(Y)
         self.Ax.set_yticklabels(self.SelLabels)

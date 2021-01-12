@@ -1,267 +1,344 @@
 GenSettings:
-  BatchSize: 1000
-  ReloadData: yes
-  Reset: no
+  BatchSize: 10000
+  ReloadData: no
+  Reset: yes
 
 Flows:
   - NuMuCCFlow:
+      Run: yes
       Selections:
         - Name: "FV Cut"
-          SelVar: "con.RecoInFV"
+          SelVar: "conr.slc.RecoInFV"
         - Name: "Pandora Clear Cosmic"
-          SelVar: "con.not_clear_cosmic"
+          SelVar: "conr.slc.not_clear_cosmic"
         - Name: "Pandora $\\nu$-Score"
-          SelVar: "con.nu_score"
+          SelVar: "conr.slc.nu_score"
         - Name: "Flash Matching Score"
-          SelVar: "con.flash_score"
+          SelVar: "conr.slc.flash_score"
         - Name: "Muon Track Identification"
-          SelVar: "con.has_ptrk"
+          SelVar: "conr.slc.has_ptrk"
   - NuMuCCFlowSmall:
+      Run: yes
       Selections:
         - Name: "TPC Pre-Selection"
-          SelVar: "con.tpc_preselection"
+          SelVar: "conr.slc.tpc_preselection"
         - Name: "Flash Matching Score"
-          SelVar: "con.flash_score"
+          SelVar: "conr.slc.flash_score"
         - Name: "Muon Track Identification"
-          SelVar: "con.has_ptrk"
+          SelVar: "conr.slc.has_ptrk"
 
 Cuts:
   - FVCutCosmics:
+      Run: yes
       Bins: [0, 600, 21]
       Labels: ["Reco FV Cosmics", "All Cosmics"]
       XLabel: "Cosmic $\\mu$ Length [cm]"
       Text: "Cosmic $\\mu$`s"
       TextPos: [0.25, 0.6]
-      Var: "con.mu_max_track"
-      MaskVar: ["con.is_cosmic"]
-      SelVar: "con.RecoInFV"
+      Var: "cont.slc.mu_max_track"
+      MaskVar: ["cont.slc.is_cosmic"]
+      SelVar: "conr.slc.RecoInFV"
       Remaining: yes
   - FVCutNuMuCC:
+      Run: yes
       Bins: [0, 3.0, 21]
       Labels: ["Reco FV $\\nu_\\mu$ CC`s", "All $\\nu_\\mu$ CC`s"]
       XLabel: "$\\nu$ Energy [GeV]"
       Text: "$\\nu_\\mu$ CC`s"
       TextPos: [0.75, 0.5]
-      Var: "slc.truth.E"
-      MaskVar: ["con.is_numu_cc"]
-      SelVar: "con.RecoInFV"
+      Var: "rec.slc.truth.E"
+      MaskVar: ["cont.slc.is_numu_cc"]
+      SelVar: "conr.slc.RecoInFV"
       Remaining: yes
   - FVClearCosmicCosmic:
+      Run: yes
       Bins: [0, 600, 21]
       Labels: ["Selected Cosmics", "All Cosmics"]
       XLabel: "Cosmic $\\mu$ Length [cm]"
       Text: "Cosmic $\\mu$`s"
       TextPos: [0.25, 0.6]
-      Var: "con.mu_max_track"
-      MaskVar: ["con.is_cosmic"]
-      SelVar: "con.not_clear_cosmic"
+      Var: "cont.slc.mu_max_track"
+      MaskVar: ["cont.slc.is_cosmic"]
+      SelVar: "conr.slc.not_clear_cosmic"
       Remaining: yes
   - FVClearCosmicNuMuCC:
+      Run: yes
       Bins: [0, 3.0, 21]
       Labels: ["Selected $\\nu_\\mu$ CC`s", "All $\\nu_\\mu CC`s$"]
       XLabel: "$\\nu$ Energy [GeV]"
       Text: "Fiducial (Truth) \n $\\nu_\\mu$ CC`s"
       TextPos: [0.75, 0.5]
-      Var: "slc.truth.E"
-      MaskVar: ["con.TruthInFV", "con.is_numu_cc", "con.match_is_primary"]
-      SelVar: "con.not_clear_cosmic"
+      Var: "rec.slc.truth.E"
+      MaskVar: ["cont.slc.TruthInFV", "cont.slc.is_numu_cc", "cont.slc.match_is_primary"]
+      SelVar: "conr.slc.not_clear_cosmic"
       Remaining: yes
   - FVClearCosmicNuScoreCosmic:
+      Run: yes
       Bins: [0, 600, 21]
       Labels: ["Selected Cosmics", "All Cosmics"]
       XLabel: "Cosmic $\\mu$ Length [cm]"
       Text: "Fiducial (Truth)\nNon-Clear Cosmic"
       TextPos: [0.75, 0.5]
-      Var: "con.mu_max_track"
-      MaskVar: ["con.is_cosmic", "con.TruthInFV", "con.not_clear_cosmic"]
-      SelVar: "con.nu_score"
+      Var: "cont.slc.mu_max_track"
+      MaskVar: ["cont.slc.is_cosmic", "cont.slc.TruthInFV", "conr.slc.not_clear_cosmic"]
+      SelVar: "conr.slc.nu_score"
       Remaining: yes
   - FVClearCosmicNuScoreNuMuCC:
+      Run: yes
       Bins: [0, 3.0, 21]
       Labels: ["Selected $\\nu_\\mu$ CC`s", "All $\\nu_\\mu CC`s$"]
       XLabel: "$\\nu$ Energy [GeV]"
       Text: "Fiducial (Truth)\nNon-Clear Cosmic"
       TextPos: [0.75, 0.5]
-      Var: "slc.truth.E"
-      MaskVar: ["con.TruthInFV", "con.is_numu_cc", "con.match_is_primary", "con.not_clear_cosmic"]
-      SelVar: "con.nu_score"
+      Var: "rec.slc.truth.E"
+      MaskVar: ["cont.slc.TruthInFV", "cont.slc.is_numu_cc", "cont.slc.match_is_primary", "conr.slc.not_clear_cosmic"]
+      SelVar: "conr.slc.nu_score"
       Remaining: yes
   - FVClearCosmicNuScoreFlashCosmic:
+      Run: yes
       Bins: [0, 600, 21]
       Labels: ["Selected Cosmics", "All Cosmics"]
       XLabel: "Cosmic $\\mu$ Length [cm]"
       Text: "Fiducial (Truth)\nNon-Clear Cosmic\nPost-Pandora $\\nu$-Score"
       TextPos: [0.75, 0.5]
-      Var: "con.mu_max_track"
-      MaskVar: ["con.is_cosmic", "con.TruthInFV", "con.not_clear_cosmic","con.nu_score"]
-      SelVar: "con.flash_score"
+      Var: "cont.slc.mu_max_track"
+      MaskVar: ["cont.slc.is_cosmic", "cont.slc.TruthInFV", "conr.slc.not_clear_cosmic","conr.slc.nu_score"]
+      SelVar: "conr.slc.flash_score"
       Remaining: yes
   - FVClearCosmicNuScoreFlashNuMuCC:
+      Run: yes
       Bins: [0, 3.0, 21]
       Labels: ["Selected $\\nu_\\mu$ CC`s", "All $\\nu_\\mu CC`s$"]
       XLabel: "$\\nu$ Energy [GeV]"
       Text: "Fiducial (Truth)\nNon-Clear Cosmic\nPost-Pandora $\\nu$-Score"
       TextPos: [0.75, 0.5]
-      Var: "slc.truth.E"
-      MaskVar: ["con.TruthInFV", "con.is_numu_cc", "con.match_is_primary", "con.not_clear_cosmic", "con.nu_score"]
-      SelVar: "con.flash_score"
+      Var: "rec.slc.truth.E"
+      MaskVar: ["cont.slc.TruthInFV", "cont.slc.is_numu_cc", "cont.slc.match_is_primary", "conr.slc.not_clear_cosmic", "conr.slc.nu_score"]
+      SelVar: "conr.slc.flash_score"
       Remaining: yes
-#  - PrimaryTrackNuMuCC:
-#      Bins: [0, 3.0, 21]
-#      Labels: ["Correct Muon $\\nu_\\mu$ CC`s", "All $\\nu_\\mu CC`s$"]
-#      XLabel: "$\\nu$ Energy [GeV]"
-#      Text: ""
-#      TextPos: [0.75, 0.5]
-#      Var: "slc.truth.E"
-#      MaskVar: ["con.valid_matched_primary", "con.match_is_primary"]
-#      SelVar: "con.ptrack_and_pmatch"
-#      Remaining: yes
   - PrimaryTrackCosmic:
+      Run: yes
       Bins: [0, 600, 21]
       Labels: ["Selected Cosmics", "All Cosmics"]
       XLabel: "Cosmic $\\mu$ Length [cm]"
       Text: ""
       TextPos: [0.25, 0.6]
-      Var: "con.mu_max_track"
-      MaskVar: ["con.is_cosmic"]
-      SelVar: "con.has_ptrk"
+      Var: "cont.slc.mu_max_track"
+      MaskVar: ["cont.slc.is_cosmic"]
+      SelVar: "conr.slc.has_ptrk"
       Remaining: yes
   - PrimaryTrackNuMuCC:
+      Run: yes
       Bins: [0, 3.0, 21]
-      Labels: ["Correct Muon $\\nu_\\mu$ CC`s", "All $\\nu_\\mu$ CC`s"]
+      Labels: ["Selected Muon $\\nu_\\mu$ CC`s", "All $\\nu_\\mu$ CC`s"]
       XLabel: "$\\nu$ Energy [GeV]"
       Text: ""
       TextPos: [0.75, 0.5]
-      Var: "slc.truth.E"
-      MaskVar: ["con.is_numu_cc"]
-      SelVar: "con.has_ptrk"
+      Var: "rec.slc.truth.E"
+      MaskVar: ["cont.slc.is_numu_cc"]
+      SelVar: "conr.slc.has_ptrk"
       Remaining: yes
   - PrimaryTrackNuOther:
+      Run: yes
       Bins: [0, 3.0, 21]
       Labels: ["Selected $\\nu$ Other", "All $\\nu$ Other"]
       XLabel: "$\\nu$ Energy [GeV]"
       Text: ""
       TextPos: [0.75, 0.5]
-      Var: "slc.truth.E"
-      MaskVar: ["con.is_nu_other"]
-      SelVar: "con.has_ptrk"
+      Var: "rec.slc.truth.E"
+      MaskVar: ["cont.slc.is_nu_other"]
+      SelVar: "conr.slc.has_ptrk"
       Remaining: yes
   - FVClearCosmicNuScoreFlashPrimaryTrackNuMuCC:
+      Run: yes
       Bins: [0, 3.0, 21]
-      Labels: ["Correct Muon $\\nu_\\mu$ CC`s", "All $\\nu_\\mu CC`s$"]
+      Labels: ["Selected Muon $\\nu_\\mu$ CC`s", "All $\\nu_\\mu CC`s$"]
       XLabel: "$\\nu$ Energy [GeV]"
       Text: "Fiducial (Truth)\nNon-Clear Cosmic\nPost-Pandora $\\nu$-Score\nPost Flash Matching Score"
       TextPos: [0.75, 0.5]
-      Var: "slc.truth.E"
-      MaskVar: ["con.TruthInFV", "con.is_numu_cc", "con.match_is_primary", "con.not_clear_cosmic", "con.nu_score", "con.flash_score"]
-      SelVar: "con.has_ptrk"
+      Var: "rec.slc.truth.E"
+      MaskVar: ["cont.slc.TruthInFV", "cont.slc.is_numu_cc", "cont.slc.match_is_primary", "conr.slc.not_clear_cosmic", "conr.slc.nu_score", "conr.slc.flash_score"]
+      SelVar: "conr.slc.has_ptrk"
       Remaining: yes
   - FVClearCosmicNuScoreFlashPrimaryTrackCosmic:
+      Run: yes
       Bins: [0, 600, 21]
       Labels: ["Selected Cosmics", "All Cosmics"]
-      XLabel: "$\\nu$ Energy [GeV]"
+      XLabel: "Cosmic $\\mu$ Length [cm]"
       Text: "Fiducial (Truth)\nNon-Clear Cosmic\nPost-Pandora $\\nu$-Score\nPost Flash Matching Score"
-      TextPos: [0.25, 0.5]
-      Var: "con.mu_max_track"
-      MaskVar: ["con.TruthInFV", "con.is_cosmic", "con.not_clear_cosmic", "con.nu_score", "con.flash_score"]
-      SelVar: "con.has_ptrk"
+      TextPos: [0.75, 0.5]
+      Var: "cont.slc.mu_max_track"
+      MaskVar: ["cont.slc.TruthInFV", "cont.slc.is_cosmic", "conr.slc.not_clear_cosmic", "conr.slc.nu_score", "conr.slc.flash_score"]
+      SelVar: "conr.slc.has_ptrk"
       Remaining: yes
 
 Discriminations:
   - NuScoreDisc:
+      Run: yes
       Bins: [0,1,20]
-      Var: "slc.nu_score"
+      Var: "rec.slc.nu_score"
       XLabel: "Pandora $\\nu$-Score"
       Text: "Fiducial (Truth)\nNon-Clear Cosmic"
       TextPos: [0.75,0.5]
-      SelVar: "con.nu_score"
+      SelVar: "conr.slc.nu_score"
       Score: 0.4
       CutAbove: no
       Types:
-        - MaskVars: ["con.TruthInFV", "con.is_cosmic", "con.not_clear_cosmic"]
+        - MaskVars: ["cont.slc.TruthInFV", "cont.slc.is_cosmic", "conr.slc.not_clear_cosmic"]
           Label: "Cosmics"
           Signal: no
-        - MaskVars: ["con.TruthInFV", "con.is_numu_cc", "con.match_is_primary", "con.not_clear_cosmic"]
+        - MaskVars: ["cont.slc.TruthInFV", "cont.slc.is_numu_cc", "cont.slc.match_is_primary", "conr.slc.not_clear_cosmic"]
           Label: "$\\nu_\\mu$ CC`s"
           Signal: yes
   - FlashScoreDisc:
+      Run: yes
       Bins: [0,40,21]
-      Var: "slc.fmatch.score"
+      Var: "rec.slc.fmatch.score"
       XLabel: "Flash Matching Score"
       Text: "Fiducial (Truth)\nNon-Clear Cosmic\nPost Pandora $\\nu$-Score"
       TextPos: [0.80,0.5]
-      SelVar: "con.flash_score"
+      SelVar: "conr.slc.flash_score"
       Score: 7.0
       CutAbove: yes
       Types:
-        - MaskVars: ["con.TruthInFV", "con.is_cosmic", "con.not_clear_cosmic", "con.nu_score"]
+        - MaskVars: ["cont.slc.TruthInFV", "cont.slc.is_cosmic", "conr.slc.not_clear_cosmic", "conr.slc.nu_score"]
           Label: "Cosmics"
           Signal: no
-        - MaskVars: ["con.TruthInFV", "con.is_numu_cc", "con.match_is_primary", "con.not_clear_cosmic", "con.nu_score"]
+        - MaskVars: ["cont.slc.TruthInFV", "cont.slc.is_numu_cc", "cont.slc.match_is_primary", "conr.slc.not_clear_cosmic", "conr.slc.nu_score"]
           Label: "$\\nu_\\mu$ CC`s"
           Signal: yes
   - Chi2MuonDisc:
+      Run: yes
       Bins: [0,50,26]
-      Var: "slc.reco.trk.bestplane.chi2_muon"
+      Var: "conr.trk.bestplane.chi2_muon"
       XLabel: "$\\chi^2_\\mathrm{muon}$"
       Text: ""
       TextPos: [0.5,0.5]
       SelVar: ""
       Types:
-        - MaskVars: ["con.is_numu_cc", "con.is_muon", "con.bestmatch_majority_energy", "con.bestmatch_majority_planeVisE"]
+        - MaskVars: ["cont.slc.is_numu_cc", "cont.trk.is_muon", "cont.trk.bestmatch_majority_energy", "cont.trk.bestmatch_majority_planeVisE"]
           Label: "CC $\\nu_\\mu$ $\\mu$`s"
           Signal: yes
-        - MaskVars: ["con.is_numu_cc", "con.is_proton", "con.bestmatch_majority_energy", "con.bestmatch_majority_planeVisE"]
+        - MaskVars: ["cont.slc.is_numu_cc", "cont.trk.is_proton", "cont.trk.bestmatch_majority_energy", "cont.trk.bestmatch_majority_planeVisE"]
           Label: "CC $\\nu_\\mu$ $p$`s"
           Signal: yes
   - Chi2MuonSubDisc:
+      Run: yes
       Bins: [0,50,26]
-      Var: "slc.reco.trk.bestplane.chi2_muon"
+      Var: "conr.trk.bestplane.chi2_muon"
       XLabel: "$\\chi^2_\\mathrm{muon}$"
       Text: ""
       TextPos: [0.5,0.5]
       SelVar: ""
       Types:
-        - MaskVars: ["con.is_numu_cc", "con.is_muon", "con.bestmatch_majority_energy", "con.bestmatch_majority_planeVisE", "slc.reco.trk.contained"]
+        - MaskVars: ["cont.slc.is_numu_cc", "cont.trk.is_muon", "cont.trk.bestmatch_majority_energy", "cont.trk.bestmatch_majority_planeVisE", "conr.trk.contained"]
           Label: "CC $\\nu_\\mu$ $\\mu$`s (Contained)"
           Signal: yes
-        - MaskVars: ["con.is_numu_cc", "con.is_muon", "con.bestmatch_majority_energy", "con.bestmatch_majority_planeVisE", "slc.reco.trk.not_contained"]
+        - MaskVars: ["cont.slc.is_numu_cc", "cont.trk.is_muon", "cont.trk.bestmatch_majority_energy", "cont.trk.bestmatch_majority_planeVisE", "conr.trk.not_contained"]
           Label: "CC $\\nu_\\mu$ $\\mu$`s (Exiting)"
           Signal: yes
-        - MaskVars: ["con.is_numu_cc", "con.is_proton", "con.bestmatch_majority_energy", "con.bestmatch_majority_planeVisE", "slc.reco.trk.contained", "slc.reco.trk.truth.p.is_stopping"]
+        - MaskVars: ["cont.slc.is_numu_cc", "cont.trk.is_proton", "cont.trk.bestmatch_majority_energy", "cont.trk.bestmatch_majority_planeVisE", "conr.trk.contained", "cont.trk.is_stopping"]
           Label: "CC $\\nu_\\mu$ $p$`s (Stopping)"
           Signal: yes
-        - MaskVars: ["con.is_numu_cc", "con.is_proton", "con.bestmatch_majority_energy", "con.bestmatch_majority_planeVisE", "slc.reco.trk.contained", "slc.reco.trk.truth.p.not_stopping"]
+        - MaskVars: ["cont.slc.is_numu_cc", "cont.trk.is_proton", "cont.trk.bestmatch_majority_energy", "cont.trk.bestmatch_majority_planeVisE", "conr.trk.contained", "cont.trk.not_stopping"]
           Label: "CC $\\nu_\\mu$ $p$`s (Scattering)"
           Signal: yes
-        - MaskVars: ["con.is_numu_cc", "con.is_proton", "con.bestmatch_majority_energy", "con.bestmatch_majority_planeVisE", "slc.reco.trk.not_contained"]
+        - MaskVars: ["cont.slc.is_numu_cc", "cont.trk.is_proton", "cont.trk.bestmatch_majority_energy", "cont.trk.bestmatch_majority_planeVisE", "conr.trk.not_contained"]
           Label: "CC $\\nu_\\mu$ $p$`s (Exiting)"
           Signal: yes
   - Chi2ProtonDisc:
+      Run: yes
       Bins: [0,300,31]
-      Var: "slc.reco.trk.bestplane.chi2_proton"
+      Var: "conr.trk.bestplane.chi2_proton"
       XLabel: "$\\chi^2_\\mathrm{proton}$"
       Text: ""
       TextPos: [0.5,0.5]
       SelVar: ""
       Types:
-        - MaskVars: ["con.is_numu_cc", "con.is_muon", "con.bestmatch_majority_energy", "con.bestmatch_majority_planeVisE"]
+        - MaskVars: ["cont.slc.is_numu_cc", "cont.trk.is_muon", "cont.trk.bestmatch_majority_energy", "cont.trk.bestmatch_majority_planeVisE"]
           Label: "CC $\\nu_\\mu$ $\\mu$`s"
           Signal: yes
-        - MaskVars: ["con.is_numu_cc", "con.is_proton", "con.bestmatch_majority_energy", "con.bestmatch_majority_planeVisE"]
+        - MaskVars: ["cont.slc.is_numu_cc", "cont.trk.is_proton", "cont.trk.bestmatch_majority_energy", "cont.trk.bestmatch_majority_planeVisE"]
           Label: "CC $\\nu_\\mu$ $p$`s"
           Signal: yes
   - PrimaryTrackDisc:
+      Run: yes
       Bins: [50,400,21]
-      Var: "slc.reco.trk.len"
+      Var: "rec.slc.reco.trk.len"
       XLabel: "Reconstructed Track Length [cm]"
       Text: "Length of Mistaken\nPrimary Tracks\nby Particle Type"
       TextPos: [0.75,0.5]
       SelVar: ""
       Types:
-        - MaskVars: ["con.has_ptrk", "con.ptrack_pion"]
+        - MaskVars: ["conr.slc.has_ptrk", "cont.ptrack_pion"]
           Label: "Pion"
           Signal: yes
-        - MaskVars: ["con.has_ptrk", "con.ptrack_proton"]
+        - MaskVars: ["conr.slc.has_ptrk", "cont.ptrack_proton"]
           Label: "Proton"
+          Signal: yes
+  - NegFlashDisc:
+      Run: yes
+      Bins: [50,400,21]
+      Var: "rec.slc.reco.trk.len"
+      XLabel: "Reconstructed Track Length [cm]"
+      Text: "Length of Mistaken\nPrimary Tracks\nby Particle Type"
+      TextPos: [0.75,0.5]
+      SelVar: ""
+      Types:
+        - MaskVars: ["cont.slc.is_cosmic", "conr.slc.flash_score_negative", "conr.slc.tpc_preselection"]
+          Label: "All "
+          Signal: yes
+  - SlcX:
+      Run: yes
+      Bins: [-410,410,40]
+      Var: "rec.slc.reco.trk.truth.p.start.x"
+      XLabel: "Truth Slice Vertex X Position [cm]"
+      Text: ""
+      TextPos: [0.5,0.5]
+      SelVar: ""
+      Types:
+        - MaskVars: ["cont.slc.is_nu"]
+          Label: "Neutrinos"
+          Signal: yes
+        - MaskVars: ["cont.slc.is_cosmic", "cont.trk.outtime"]
+          Label: "Cosmics (Out of time)"
+          Signal: yes
+        - MaskVars: ["cont.slc.is_cosmic", "cont.trk.intime"]
+          Label: "Cosmics (In time)"
+          Signal: yes
+  - SlcY:
+      Run: yes
+      Bins: [-200,200,40]
+      Var: "rec.slc.reco.trk.truth.p.start.y"
+      XLabel: "Truth Slice Vertex Y Position [cm]"
+      Text: ""
+      TextPos: [0.5,0.5]
+      SelVar: ""
+      Types:
+        - MaskVars: ["cont.slc.is_nu"]
+          Label: "Neutrinos"
+          Signal: yes
+        - MaskVars: ["cont.slc.is_cosmic", "cont.trk.outtime"]
+          Label: "Cosmics (Out of time)"
+          Signal: yes
+        - MaskVars: ["cont.slc.is_cosmic", "cont.trk.intime"]
+          Label: "Cosmics (In time)"
+          Signal: yes
+  - SlcZ:
+      Run: yes
+      Bins: [-1100,1100,50]
+      Var: "rec.slc.reco.trk.truth.p.start.z"
+      XLabel: "Truth Slice Vertex Z Position [cm]"
+      Text: ""
+      TextPos: [0.5,0.5]
+      SelVar: ""
+      Types:
+        - MaskVars: ["cont.slc.is_nu"]
+          Label: "Neutrinos"
+          Signal: yes
+        - MaskVars: ["cont.slc.is_cosmic", "cont.trk.outtime"]
+          Label: "Cosmics (Out of time)"
+          Signal: yes
+        - MaskVars: ["cont.slc.is_cosmic", "cont.trk.intime"]
+          Label: "Cosmics (In time)"
           Signal: yes
